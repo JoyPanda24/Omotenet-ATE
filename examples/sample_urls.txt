@@ -1,0 +1,14 @@
+https://app.local/api/users/1
+https://app.local/api/users/2
+https://app.local/api/users/3
+https://app.local/api/users/10
+https://app.local/api/users/100
+https://app.local/api/users/1000
+https://app.local/api/profile/1
+https://app.local/api/profile/2
+https://app.local/api/profile/42
+https://app.local/api/accounts/1001
+https://app.local/api/accounts/1002
+https://app.local/api/documents/doc_001
+https://app.local/api/documents/doc_002
+https://app.local/api/documents/doc_999
