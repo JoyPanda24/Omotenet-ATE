@@ -9,73 +9,79 @@ import json
 from pathlib import Path
 from typing import Dict, Any
 
+import pytest
+
+
+pytestmark = [pytest.mark.asyncio, pytest.mark.integration]
+
 # Simulated test data (since actual exports may not be available)
 
 SAMPLE_BLOODHOUND_DATA = {
-    "nodes": [
+    "Users": [
         {
             "objectid": "ADMIN@COMPANY.COM",
-            "type": "User",
             "name": "admin@company.com",
             "email": "admin@company.com",
-            "displayname": "Administrator"
+            "displayname": "Administrator",
+            "admin_count": 1
         },
         {
             "objectid": "JOHN.SMITH@COMPANY.COM",
-            "type": "User",
             "name": "john.smith@company.com",
-            "email": "john.smith@company.com"
-        },
+            "email": "john.smith@company.com",
+            "displayname": "John Smith",
+            "admin_count": 0
+        }
+    ],
+    "Computers": [
         {
             "objectid": "WEB-PROD-01$@COMPANY.COM",
-            "type": "Computer",
             "name": "web-prod-01.company.com",
             "operatingsystem": "Windows Server 2019",
             "ipaddress": "10.0.1.50"
         },
         {
             "objectid": "DC-01$@COMPANY.COM",
-            "type": "Computer",
             "name": "dc-01.company.com",
             "operatingsystem": "Windows Server 2019",
             "ipaddress": "10.0.0.1"
-        },
+        }
+    ],
+    "Groups": [
         {
             "objectid": "DOMAIN ADMINS@COMPANY.COM",
-            "type": "Group",
             "name": "Domain Admins@company.com"
         },
         {
             "objectid": "DEVELOPERS@COMPANY.COM",
-            "type": "Group",
             "name": "Developers@company.com"
         }
     ],
-    "relationships": [
+    "Relationships": [
         {
             "source": "ADMIN@COMPANY.COM",
             "target": "DOMAIN ADMINS@COMPANY.COM",
-            "relationshiptype": "MemberOf"
+            "reltype": "MemberOf"
         },
         {
             "source": "JOHN.SMITH@COMPANY.COM",
             "target": "DEVELOPERS@COMPANY.COM",
-            "relationshiptype": "MemberOf"
+            "reltype": "MemberOf"
         },
         {
             "source": "JOHN.SMITH@COMPANY.COM",
             "target": "WEB-PROD-01$@COMPANY.COM",
-            "relationshiptype": "HasSession"
+            "reltype": "HasSession"
         },
         {
             "source": "DOMAIN ADMINS@COMPANY.COM",
             "target": "DC-01$@COMPANY.COM",
-            "relationshiptype": "AdminTo"
+            "reltype": "AdminTo"
         },
         {
             "source": "DOMAIN ADMINS@COMPANY.COM",
             "target": "WEB-PROD-01$@COMPANY.COM",
-            "relationshiptype": "AdminTo"
+            "reltype": "AdminTo"
         }
     ]
 }
@@ -120,49 +126,49 @@ SAMPLE_BURP_DATA = """<?xml version="1.0"?>
 
 SAMPLE_TRAFFIC_DATA = [
     {
-        "index": {"index": 1},
-        "layers": {
-            "frame": {"frame.number": "1"},
-            "ip": {
-                "ip.src": "192.168.1.100",
-                "ip.dst": "10.0.1.50",
-                "ip.proto": "6"
-            },
-            "tcp": {"tcp.srcport": "54321", "tcp.dstport": "80"},
-            "http": {
-                "http.request.method": "GET",
-                "http.request.uri": "/api/users?id=1",
-                "http.host": "web.company.com"
-            }
-        }
+        "frame": {"frame.number": "1"},
+        "ip": {
+            "ip.src": "192.168.1.100",
+            "ip.dst": "10.0.1.50",
+            "ip.proto": "6"
+        },
+        "tcp": {"tcp.srcport": "54321", "tcp.dstport": "80"},
+        "http": {
+            "http.request.method": "GET",
+            "http.request.uri": "/api/users?id=1",
+            "http.host": "web.company.com"
+        },
+        "data": {"data.data": "username=admin password=P@ssw0rd123"}
     },
     {
-        "index": {"index": 2},
-        "layers": {
-            "frame": {"frame.number": "2"},
-            "ip": {
-                "ip.src": "10.0.1.50",
-                "ip.dst": "10.0.0.100",
-                "ip.proto": "6"
-            },
-            "tcp": {"tcp.srcport": "12345", "tcp.dstport": "21"},
-            "ftp": {"ftp.command": "USER admin"},
-            "data": {"data.data": "USER admin"}
-        }
+        "frame": {"frame.number": "2"},
+        "ip": {
+            "ip.src": "10.0.1.50",
+            "ip.dst": "10.0.0.100",
+            "ip.proto": "6"
+        },
+        "tcp": {"tcp.srcport": "12345", "tcp.dstport": "80"},
+        "http": {
+            "http.request.method": "POST",
+            "http.request.uri": "/login",
+            "http.host": "web.company.com"
+        },
+        "data": {"data.data": "user=admin&password=P@ssw0rd123"}
     },
     {
-        "index": {"index": 3},
-        "layers": {
-            "frame": {"frame.number": "3"},
-            "ip": {
-                "ip.src": "10.0.1.50",
-                "ip.dst": "10.0.0.100",
-                "ip.proto": "6"
-            },
-            "tcp": {"tcp.srcport": "12345", "tcp.dstport": "21"},
-            "ftp": {"ftp.command": "PASS P@ssw0rd123"},
-            "data": {"data.data": "PASS P@ssw0rd123"}
-        }
+        "frame": {"frame.number": "3"},
+        "ip": {
+            "ip.src": "10.0.1.50",
+            "ip.dst": "10.0.0.100",
+            "ip.proto": "6"
+        },
+        "tcp": {"tcp.srcport": "12345", "tcp.dstport": "80"},
+        "http": {
+            "http.request.method": "GET",
+            "http.request.uri": "/admin",
+            "http.host": "web.company.com"
+        },
+        "data": {"data.data": "Authorization: Basic YWRtaW46UEBzc3cwcmQxMjM="}
     }
 ]
 
@@ -193,6 +199,9 @@ async def test_bloodhound_ingestor():
         print(f"  Nodes: {len(nodes)}")
         print(f"  Edges: {len(edges)}")
         print(f"  Findings: {len(findings)}")
+
+        assert nodes, "BloodHound ingestor should return nodes for the sample export"
+        assert edges, "BloodHound ingestor should return edges for the sample export"
         
         print(f"\n  Node Types:")
         for node_id, node in nodes.items():
@@ -230,6 +239,9 @@ async def test_burp_ingestor():
         print(f"  Nodes: {len(nodes)}")
         print(f"  Edges: {len(edges)}")
         print(f"  Findings: {len(findings)}")
+
+        assert nodes, "Burp ingestor should return endpoint nodes"
+        assert edges, "Burp ingestor should return issue edges"
         
         print(f"\n  Nodes (Web Endpoints):")
         for node_id, node in nodes.items():
@@ -267,6 +279,9 @@ async def test_traffic_ingestor():
         print(f"  Nodes: {len(nodes)}")
         print(f"  Edges: {len(edges)}")
         print(f"  Findings: {len(findings)}")
+
+        assert nodes, "Traffic ingestor should return IP nodes"
+        assert edges, "Traffic ingestor should return communication edges"
         
         print(f"\n  IP Nodes:")
         for node_id, node in nodes.items():
@@ -385,8 +400,7 @@ async def test_tactical_orchestration(attack_paths):
     print("="*80)
     
     if not attack_paths:
-        print("[FAIL] No attack paths to orchestrate")
-        return False
+        pytest.skip("No attack paths available from fixtures")
     
     try:
         from ate.modules.scanner_sync import ActiveNextSteps
