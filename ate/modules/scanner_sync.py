@@ -8,7 +8,7 @@ from typing import List, Dict, Optional, Set, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
 
-from ..core.reasoning_engine_v2 import AttackPath
+from ..core.reasoning_engine_v2 import MultiSourceAttackPath
 from ..core.data_models import SeverityLevel, AtomicFinding
 
 logger = logging.getLogger(__name__)
@@ -69,7 +69,7 @@ class ActiveNextSteps:
         self.blockers: List[PathBlocker] = []
         self.tactical_actions: List[TacticalAction] = []
 
-    def analyze_paths(self, attack_paths: List[AttackPath]) -> List[TacticalAction]:
+    def analyze_paths(self, attack_paths: List[MultiSourceAttackPath]) -> List[TacticalAction]:
         """
         Analyze attack paths and generate tactical actions.
         
@@ -94,7 +94,7 @@ class ActiveNextSteps:
         self.tactical_actions = all_actions
         return all_actions
 
-    def _analyze_path(self, path: AttackPath) -> List[TacticalAction]:
+    def _analyze_path(self, path: MultiSourceAttackPath) -> List[TacticalAction]:
         """Analyze single path for blockers and actions."""
         actions = []
         blockers = []
@@ -147,7 +147,7 @@ class ActiveNextSteps:
     def _generate_credential_actions(
         self,
         target_node: str,
-        path: AttackPath
+        path: MultiSourceAttackPath
     ) -> List[TacticalAction]:
         """Generate actions to capture missing credentials."""
         actions = []
@@ -185,7 +185,7 @@ class ActiveNextSteps:
 
     def generate_playbook(
         self,
-        attack_paths: List[AttackPath],
+        attack_paths: List[MultiSourceAttackPath],
         output_format: str = 'text'
     ) -> str:
         """

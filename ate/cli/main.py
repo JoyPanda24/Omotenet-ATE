@@ -4,19 +4,15 @@ ATE CLI - Main command-line interface for Attack Thinking Engine.
 import logging
 import json
 import click
-from pathlib import Path
 from typing import Optional
 from rich.console import Console
 from rich.table import Table
-from rich.panel import Panel
-from rich.syntax import Syntax
 
 from ..core import (
     GraphBuilder, ReasoningEngine, NodeType, VulnerabilityType,
-    SeverityLevel, AtomicFinding, AnalysisResult
+    SeverityLevel, AtomicFinding, AttackPath
 )
-from ..modules import IDORDetector, AuthFlawsDetector, SensitiveDataExposureDetector
-from .visualizer import AttackPathVisualizer
+from ..modules import IDORDetector
 from .story_renderer import StoryRenderer
 
 # Setup logging

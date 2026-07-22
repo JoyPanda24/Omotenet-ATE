@@ -236,13 +236,23 @@ class GraphBuilder:
 
     def get_graph_statistics(self) -> Dict:
         """Get graph statistics."""
+        node_count = self.graph.number_of_nodes()
+        edge_count = self.graph.number_of_edges()
+
+        if node_count == 0:
+            is_connected = False
+            num_components = 0
+        else:
+            is_connected = nx.is_strongly_connected(self.graph)
+            num_components = nx.number_strongly_connected_components(self.graph)
+
         return {
-            'num_nodes': self.graph.number_of_nodes(),
-            'num_edges': self.graph.number_of_edges(),
+            'num_nodes': node_count,
+            'num_edges': edge_count,
             'num_findings': len(self.findings),
             'density': nx.density(self.graph),
-            'is_connected': nx.is_strongly_connected(self.graph),
-            'num_components': nx.number_strongly_connected_components(self.graph)
+            'is_connected': is_connected,
+            'num_components': num_components
         }
 
     def get_critical_nodes(self, top_n: int = 5) -> List[Tuple[str, float]]:

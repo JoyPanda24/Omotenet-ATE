@@ -4,14 +4,12 @@ Synthesizes data from BloodHound, Burp Suite, and Wireshark traffic analysis
 to identify cross-layer attack paths and privilege escalation routes.
 """
 import logging
-import asyncio
-from typing import Dict, List, Optional, Set, Tuple, Any
+from typing import Dict, List, Optional, Tuple, Any
 import networkx as nx
 from dataclasses import dataclass, field
 
 from .data_models import (
-    GraphNode, GraphEdge, NodeType, AtomicFinding,
-    VulnerabilityType, SeverityLevel
+    GraphNode, GraphEdge, NodeType, SeverityLevel
 )
 from .graph_builder import GraphBuilder
 
@@ -19,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class AttackPath:
+class MultiSourceAttackPath:
     """Represents a complete attack path across multiple layers."""
     path_id: str
     nodes: List[GraphNode] = field(default_factory=list)
@@ -46,7 +44,7 @@ class EnhancedReasoningEngine:
         """
         self.graph = graph_builder
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.attack_paths: List[AttackPath] = []
+        self.attack_paths: List[MultiSourceAttackPath] = []
         self.pivots: List[Tuple[GraphNode, GraphNode]] = []
         self.credential_mappings: Dict[str, List[GraphNode]] = {}
 
@@ -59,7 +57,7 @@ class EnhancedReasoningEngine:
         traffic_nodes: Dict[str, GraphNode],
         traffic_edges: List[GraphEdge],
         traffic_credentials: Dict[str, Any]
-    ) -> List[AttackPath]:
+    ) -> List[MultiSourceAttackPath]:
         """
         Comprehensive multi-source attack path analysis.
         
@@ -287,7 +285,7 @@ class EnhancedReasoningEngine:
         traffic_nodes: Dict[str, GraphNode],
         source_node_id: Optional[str] = None,
         target_node_id: Optional[str] = None
-    ) -> List[AttackPath]:
+    ) -> List[MultiSourceAttackPath]:
         """
         Find cross-layer attack paths using NetworkX pathfinding.
         Identifies "Path of Least Resistance" from external network access
@@ -380,7 +378,7 @@ class EnhancedReasoningEngine:
             # Sort by weight (lower weight = more resistant)
             ranked_paths.sort(key=lambda x: x[0])
             
-            # Create AttackPath objects
+            # Create MultiSourceAttackPath objects
             for idx, (weight, path_nodes, path_edges, layers) in enumerate(ranked_paths[:5]):  # Top 5 paths
                 node_objects = [
                     bh_nodes.get(n) or burp_nodes.get(n) or traffic_nodes.get(n)
@@ -397,7 +395,7 @@ class EnhancedReasoningEngine:
                     bh_nodes, burp_nodes
                 )
                 
-                attack_path = AttackPath(
+                attack_path = MultiSourceAttackPath(
                     path_id=f"attack_path_{idx}",
                     nodes=node_objects,
                     edges=path_edges,
@@ -499,15 +497,15 @@ class EnhancedReasoningEngine:
         
         return actions
 
-    def find_critical_paths(self) -> List[AttackPath]:
+    def find_critical_paths(self) -> List[MultiSourceAttackPath]:
         """Find paths with CRITICAL severity."""
         return [p for p in self.attack_paths if p.severity == SeverityLevel.CRITICAL]
 
-    def find_paths_by_layer_count(self, layer_count: int) -> List[AttackPath]:
+    def find_paths_by_layer_count(self, layer_count: int) -> List[MultiSourceAttackPath]:
         """Find paths crossing specified number of layers."""
         return [p for p in self.attack_paths if len(p.layers) == layer_count]
 
-    def get_path_summary(self, path: AttackPath) -> str:
+    def get_path_summary(self, path: MultiSourceAttackPath) -> str:
         """Generate human-readable summary of attack path."""
         summary = f"\n🎯 Attack Path: {path.path_id}\n"
         summary += f"  Severity: {path.severity}\n"
