@@ -280,19 +280,60 @@ class TrafficIngestor:
         """Extract field from packet, trying multiple paths."""
         for field_path in field_paths:
             try:
-                value = packet
-                for key in field_path.split('.'):
-                    if isinstance(value, dict):
-                        value = value.get(key)
-                    else:
-                        value = None
-                        break
-                
-                if value:
+                value = self._resolve_packet_field(packet, field_path)
+
+                if value not in (None, ''):
                     return str(value)
             except:
                 continue
         
+        return None
+
+    def _resolve_packet_field(self, packet: Dict, field_path: str) -> Optional[str]:
+        """Resolve a tshark field from nested or flattened packet structures.
+
+        Supports both documented tshark exports with a top-level ``layers``
+        object and simplified fixtures that place ``ip``/``tcp``/``data``
+        directly on the packet.
+        """
+        candidates = [packet]
+        if isinstance(packet, dict) and isinstance(packet.get('layers'), dict):
+            candidates.append(packet['layers'])
+
+        parts = field_path.split('.')
+
+        for candidate in candidates:
+            value = self._resolve_path(candidate, parts, [])
+            if value not in (None, ''):
+                return value
+
+        return None
+
+    def _resolve_path(self, value, parts: List[str], prefix: List[str]):
+        if not parts:
+            return value
+
+        if not isinstance(value, dict):
+            return None
+
+        remaining = '.'.join(prefix + parts)
+        if remaining in value:
+            return value[remaining]
+
+        for index in range(len(parts), 0, -1):
+            prefix = '.'.join(parts[:index])
+            if prefix in value:
+                next_value = value[prefix]
+                resolved = self._resolve_path(next_value, parts[index:], prefix=prefix.split('.'))
+                if resolved not in (None, ''):
+                    return resolved
+
+        first_key = parts[0]
+        if first_key in value:
+            resolved = self._resolve_path(value[first_key], parts[1:], prefix + [first_key])
+            if resolved not in (None, ''):
+                return resolved
+
         return None
 
     def _get_protocol_name(self, packet: Dict) -> str:
