@@ -136,7 +136,7 @@ Detection Methods:
 Pattern Library:
   - Email: RFC 5322 pattern
   - Credit Cards: Luhn algorithm
-  - SSN: XXX-XX-XXXX format
+  - SSN: NNN-NN-NNNN format
   - API Keys: >20 character alphanumeric
   - JWT: Valid JWT structure
   - Private Keys: PEM headers

@@ -98,15 +98,18 @@ class StoryRenderer:
         output.write("EXECUTIVE SUMMARY\n")
         output.write("─" * 70 + "\n\n")
         
-        summary = f"""
-Total Attack Paths Found: {len(result.attack_paths)}
-Critical Findings: {result.critical_findings}
-High-Severity Findings: {result.high_findings}
-Total Findings: {result.total_findings}
+        most_dangerous_path = result.most_dangerous_path
+        risk_score = f"{most_dangerous_path.risk_score:.1f}/100" if most_dangerous_path else "N/A"
 
-Most Dangerous Path: {result.most_dangerous_path.id if result.most_dangerous_path else 'None'}
-Risk Score: {result.most_dangerous_path.risk_score:.1f}/100 if result.most_dangerous_path else 'N/A'
-"""
+        summary = f"""
+    Total Attack Paths Found: {len(result.attack_paths)}
+    Critical Findings: {result.critical_findings}
+    High-Severity Findings: {result.high_findings}
+    Total Findings: {result.total_findings}
+
+    Most Dangerous Path: {most_dangerous_path.id if most_dangerous_path else 'None'}
+    Risk Score: {risk_score}
+    """
         output.write(summary)
         
         # Detailed narrative for most dangerous path

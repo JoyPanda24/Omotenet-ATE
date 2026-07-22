@@ -23,7 +23,7 @@ elif command -v pacman &> /dev/null; then
     PYTHON_PKG="python python-pip"
     GRAPHVIZ_PKG="graphviz"
 else
-    echo "[-] Unsupported package manager. Please install Python 3.10+ and graphviz manually."
+    echo "[-] Unsupported package manager. Please install Python 3.13+ and graphviz manually."
     exit 1
 fi
 
@@ -45,7 +45,7 @@ PYTHON_MINOR=$(echo $PYTHON_VERSION | cut -d'.' -f2)
 echo "[+] Found Python $PYTHON_VERSION"
 
 if [ $PYTHON_MAJOR -lt 3 ] || ([ $PYTHON_MAJOR -eq 3 ] && [ $PYTHON_MINOR -lt 10 ]); then
-    echo "[-] Python 3.10+ is required. Current version: $PYTHON_VERSION"
+    echo "[-] Python 3.13+ is the validated target for this project. Current version: $PYTHON_VERSION"
     exit 1
 fi
 

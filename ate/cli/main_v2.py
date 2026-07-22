@@ -123,8 +123,7 @@ def analyze_multi(
         )
         
         # Run async analysis
-        loop = asyncio.get_event_loop()
-        results = loop.run_until_complete(
+        results = asyncio.run(
             _run_multi_source_analysis(
                 burp, bloodhound, pcap,
                 output_format, min_severity
@@ -179,21 +178,19 @@ def test_ingestor(ingestor: str, data_file: str):
     try:
         console.print(f"[yellow]Testing {ingestor} ingestor with {data_file}...[/yellow]")
         
-        loop = asyncio.get_event_loop()
-        
         if ingestor == 'bloodhound':
             bh = BloodHoundIngestor(data_file)
-            nodes, edges, findings = loop.run_until_complete(bh.ingest())
+            nodes, edges, findings = asyncio.run(bh.ingest())
             console.print(f"[green]✓ Loaded {len(nodes)} nodes, {len(edges)} edges[/green]")
         
         elif ingestor == 'burp':
             burp = BurpIngestor(data_file)
-            nodes, edges, findings = loop.run_until_complete(burp.ingest())
+            nodes, edges, findings = asyncio.run(burp.ingest())
             console.print(f"[green]✓ Loaded {len(nodes)} nodes, {len(edges)} edges[/green]")
         
         elif ingestor == 'traffic':
             traffic = TrafficIngestor(data_file)
-            nodes, edges, findings = loop.run_until_complete(traffic.ingest())
+            nodes, edges, findings = asyncio.run(traffic.ingest())
             console.print(f"[green]✓ Loaded {len(nodes)} nodes, {len(edges)} edges[/green]")
             console.print(f"[yellow]Credentials found: {len(traffic.get_exposed_credentials())}[/yellow]")
     

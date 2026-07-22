@@ -58,7 +58,7 @@ Wireshark (Network Traffic & Credentials)
 
 ### Prerequisites
 
-- Python 3.10 or higher
+- Python 3.13 or higher (tested)
 - pip package manager
 - Access to BloodHound, Burp Suite, and/or Wireshark for data export
 
@@ -76,7 +76,7 @@ Wireshark (Network Traffic & Credentials)
 
    If you encounter dependency issues, install core packages individually:
    ```bash
-   pip install networkx==3.2.1 rich==13.7.0 click==8.1.7 pydantic==2.4.2
+  pip install networkx>=3.4 rich>=13.9 click>=8.1.8 pydantic>=2.11 fastapi>=0.115 uvicorn>=0.34
    ```
 
 3. **Verify Installation**
@@ -424,7 +424,7 @@ Focus remediation on CRITICAL paths first.
 
 **Solution:**
 ```bash
-pip install networkx==3.2.1
+pip install networkx>=3.4
 ```
 
 ### Issue: "No pivot points discovered"
@@ -634,7 +634,7 @@ Cron entry:
 ### Common Issues & Solutions
 
 **ImportError on modules:**
-- Ensure Python 3.10+: `python --version`
+- Ensure Python 3.13+ (or any environment with the updated dependency set): `python --version`
 - Reinstall dependencies: `pip install -r requirements.txt`
 
 **File not found errors:**

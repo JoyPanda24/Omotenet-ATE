@@ -364,7 +364,7 @@ Graph operations (pivot discovery, pathfinding):
 ## Requirements
 
 ### Hard Requirements
-- Python 3.10+
+- Python 3.13+ (tested)
 - NetworkX 3.2.1+
 - Pydantic 2.0+
 - Click 8.0+

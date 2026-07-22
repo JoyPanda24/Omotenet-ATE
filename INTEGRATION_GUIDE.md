@@ -1,6 +1,6 @@
 """
 Integration Guide: Multi-Source Attack Path Analysis
-Complete examples and walkthroughs for using ATE with BloodHound, Burp, and Wireshark
+Complete examples and walkthroughs for using ATE with BloodHound, Burp, and Wireshark on Python 3.13+
 """
 
 # ============================================================================

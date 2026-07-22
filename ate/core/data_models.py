@@ -10,10 +10,12 @@ from datetime import datetime
 class NodeType(Enum):
     """Types of nodes in the attack graph."""
     USER = "user"
+    ACCOUNT = "user"
     ROLE = "role"
     ENDPOINT = "endpoint"
     DATA_OBJECT = "data_object"
     RESOURCE = "resource"
+    DEVICE = "resource"
 
 
 class VulnerabilityType(Enum):

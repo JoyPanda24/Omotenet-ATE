@@ -92,7 +92,7 @@ class BloodHoundIngestor:
 
     async def _load_json_async(self) -> Dict:
         """Load JSON file asynchronously."""
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, self._load_json_sync)
 
     def _load_json_sync(self) -> Dict:

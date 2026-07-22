@@ -94,7 +94,7 @@ class BurpIngestor:
 
     async def _load_xml_async(self):
         """Load XML file asynchronously."""
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         self.burp_data = await loop.run_in_executor(None, self._load_xml_sync)
 
     def _load_xml_sync(self) -> Dict:
@@ -132,7 +132,7 @@ class BurpIngestor:
 
     async def _load_json_async(self):
         """Load JSON file asynchronously."""
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         self.burp_data = await loop.run_in_executor(None, self._load_json_sync)
 
     def _load_json_sync(self) -> Dict:

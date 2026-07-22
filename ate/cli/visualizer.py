@@ -207,3 +207,7 @@ class AttackPathVisualizer:
         output.write(f"  Level: {level}\n\n")
         
         return output.getvalue()
+
+
+class GraphVisualizer(AttackPathVisualizer):
+    """Backward-compatible alias for older CLI entry points."""

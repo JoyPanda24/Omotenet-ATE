@@ -3,7 +3,7 @@
 ## 5-Minute Setup
 
 ### Prerequisites
-- Python 3.10 or higher
+- Python 3.13 or higher (tested)
 - Git
 - Kali, Arch, BlackArch, or Parrot OS (or any Linux distribution)
 

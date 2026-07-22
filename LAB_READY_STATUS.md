@@ -126,13 +126,13 @@ Filter and export only CRITICAL severity findings for remediation prioritization
 ## System Requirements
 
 ### Minimum
-- Python 3.10+
+- Python 3.13+ (tested)
 - 4GB RAM
 - 2GB disk space
 - Windows 10+, Ubuntu 18.04+, or macOS 10.15+
 
 ### Recommended
-- Python 3.11+
+- Python 3.13+ (tested)
 - 16GB RAM (for 10K+ node graphs)
 - SSD storage
 - 4+ CPU cores
@@ -221,7 +221,7 @@ Complete documentation available in:
 
 **No module named 'networkx'**
 ```bash
-pip install networkx==3.2.1
+pip install networkx>=3.4
 ```
 
 **No pivot points discovered**
